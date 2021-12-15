@@ -1,5 +1,4 @@
-import { round } from 'lodash';
-import pathfinder from './pathfinder/pathfinder';
+import pathfinder from './pathfinder';
 
 const canvas = document.querySelector('canvas')!;
 const ctx = canvas.getContext('2d');
@@ -34,8 +33,8 @@ interface ShortestPath {
 }
 
 const formattedTime = (milliseconds: number): string => {
-   const seconds = String(round(milliseconds / 1000));
-   const minutes = String(round(milliseconds / 60000));
+   const seconds = String(Math.round(milliseconds / 1000));
+   const minutes = String(Math.round(milliseconds / 60000));
 
    return `${minutes.padStart(2, '0')}:${seconds.padStart(2, '0')}`;
 };

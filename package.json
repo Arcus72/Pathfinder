@@ -1,11 +1,11 @@
 {
    "name": "pathfinder",
    "version": "1.0.0",
-   "description": "",
-   "main": "index.js",
+   "description": "Program introduces system which finds the shortest path between many points.",
+   "source": "src/index.html",
    "scripts": {
-      "test": "echo \"Error: no test specified\" && exit 1",
-      "start": "parcel src/index.html"
+      "start": "parcel src/index.html",
+      "build": "parcel build src/index.html"
    },
    "keywords": [],
    "author": "",
@@ -17,7 +17,5 @@
       "sass": "^1.44.0",
       "typescript": "^4.5.2"
    },
-   "dependencies": {
-      "lodash": "^4.17.21"
-   }
+   "dependencies": {}
 }
