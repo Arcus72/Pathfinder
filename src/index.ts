@@ -1,5 +1,3 @@
-import pathfinder from './pathfinder';
-
 const canvas = document.querySelector('canvas')!;
 const ctx = canvas.getContext('2d');
 
@@ -9,63 +7,84 @@ const timeDisplay = document.querySelector('.timeDisplay') as HTMLSpanElement;
 const pointsDisplay = document.querySelector('.pointsDisplay') as HTMLSpanElement;
 
 const distanceDisplay = document.querySelector('.distanceDisplay') as HTMLSpanElement;
+const percentDiv = document?.querySelector('.percent');
+const loaderDiv = document.querySelector('.loader') as HTMLSpanElement;
+const warningCurtain = document.querySelector('.warningCurtain') as HTMLDivElement;
+
+const myWorker = new Worker('src/pathfinder.ts');
 
 interface Point {
    x: number;
    y: number;
 }
 
-let pointsArr: Point[] = [];
-
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-
-canvas.onclick = (e) => addPoint({ x: e.clientX, y: e.clientY });
-
-restartBtn.onclick = () => {
-   clearCanvas();
-   restartStats();
-};
-
 interface ShortestPath {
    distance: number;
    points: Point[];
 }
 
+let isAddingPointEnabled = true;
+let pointsArr: Point[] = [];
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+canvas.onclick = (e) => isAddingPointEnabled && addPoint({ x: e.clientX, y: e.clientY });
+
+restartBtn.onclick = () => {
+   isAddingPointEnabled = true;
+   clearCanvas();
+   restartStats();
+};
+
 const formattedTime = (milliseconds: number): string => {
-   const seconds = String(Math.round(milliseconds / 1000));
-   const minutes = String(Math.round(milliseconds / 60000));
+   const seconds = String(Math.floor((milliseconds / 1000) % 60));
+   const minutes = String(Math.floor((milliseconds / (60 * 1000)) % 60));
 
    return `${minutes.padStart(2, '0')}:${seconds.padStart(2, '0')}`;
 };
 
+let startTime: number;
 startBtn.onclick = () => {
-   startBtn.textContent = 'Searching...';
-   const startTime = new Date().getTime();
-   const shortestPath: ShortestPath | 'exit' = pathfinder(pointsArr);
-   const endTime = new Date().getTime();
-
-   if (shortestPath !== 'exit') {
-      insertValToEl(distanceDisplay, String(shortestPath.distance) + 'px');
-      paintLines(shortestPath.points);
-      const timeDelta = endTime - startTime;
-      insertValToEl(timeDisplay, formattedTime(timeDelta));
-   } else {
-      alert('Too few points');
-   }
-   startBtn.textContent = 'Find';
+   loaderDiv.style.display = 'flex';
+   startBtn.disabled = true;
+   startTime = new Date().getTime();
+   myWorker.postMessage(pointsArr);
 };
 
+myWorker.onmessage = (e) => {
+   if (e.data[0] == 'time') {
+      percentDiv!.textContent = e.data[1];
+   } else {
+      const shortestPath: ShortestPath | 'Too few points' = e.data[1];
+      const endTime = new Date().getTime();
+      loaderDiv.style.display = 'none';
+      if (shortestPath !== 'Too few points') {
+         isAddingPointEnabled = false;
+         const timeDelta = endTime - startTime;
+         distanceDisplay.textContent = String(shortestPath.distance) + 'px';
+         paintLines(shortestPath.points);
+         timeDisplay.textContent = formattedTime(timeDelta);
+      } else {
+         warningCurtain.classList.add('show');
+         startBtn.disabled = false;
+      }
+   }
+};
+
+warningCurtain.onclick = () => warningCurtain.classList.remove('show');
+
 const restartStats = () => {
-   insertValToEl(pointsDisplay, '0');
-   insertValToEl(distanceDisplay, '0');
-   insertValToEl(timeDisplay, '00:00');
+   pointsDisplay.textContent = '0';
+   distanceDisplay.textContent = '0';
+   timeDisplay.textContent = '00:00';
+   startBtn.disabled = false;
 };
 
 const addPoint = ({ x, y }: Point): void => {
    paintPoint(x, y);
    pointsArr.push({ x: x, y: y });
-   insertValToEl(pointsDisplay, String(pointsArr.length));
+   pointsDisplay.textContent = String(pointsArr.length);
 };
 
 const paintPoint = (x: number, y: number): void | 'exit' => {
@@ -81,7 +100,7 @@ const clearCanvas = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
    }
    pointsArr = [];
-   insertValToEl(pointsDisplay, String(pointsArr.length));
+   pointsDisplay.textContent = String(pointsArr.length);
 };
 
 const paintLine = (point1: Point, point2: Point): void => {
@@ -97,8 +116,4 @@ const paintLines = (arr: Point[]) => {
    for (let i = 0; i < arr.length - 1; i++) {
       paintLine(arr[i], arr[i + 1]);
    }
-};
-
-const insertValToEl = (el: HTMLSpanElement, val: string): void => {
-   el.textContent = val;
 };

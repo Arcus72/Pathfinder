@@ -6,19 +6,19 @@ Program introduces system which finds the shortest path between many points.
 
 First, install node_modules:
 
-```
+```npm
 npm i
 ```
 
 Then you are able to run server:
 
-```
+```npm
 npm run start
 ```
 
 To build projects use:
 
-```
+```npm
 npm run build
 ```
 
