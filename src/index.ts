@@ -11,7 +11,7 @@ const percentDiv = document?.querySelector('.percent');
 const loaderDiv = document.querySelector('.loader') as HTMLSpanElement;
 const warningCurtain = document.querySelector('.warningCurtain') as HTMLDivElement;
 
-const myWorker = new Worker('src/pathfinder.ts');
+const myWorker = new Worker(new URL('./pathfinder.ts', import.meta.url), { type: 'module' });
 
 interface Point {
    x: number;

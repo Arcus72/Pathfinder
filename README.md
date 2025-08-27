@@ -1,37 +1,43 @@
-Program introduces system which finds the shortest path between many points.
+# Shortest Path Finder
 
-# How To Use
+This program finds the shortest path between multiple points.
+👉 [Live Demo](https://arcus72-pathfinder.netlify.app/)
 
-## How To Use
+---
 
-First, install node_modules:
+## Features
 
-```npm
-npm i
+-  Finds the shortest path between multiple points
+-  Brute force approach (no optimizations)
+-  Easy to run locally
+-  Uses Web Workers to run heavy calculations in a separate thread, keeping the UI responsive
+
+## Installation
+
+First, install dependencies:
+
+```bash
+npm install
 ```
 
-Then you are able to run server:
+## Running the Server
 
-```npm
-npm run start
+To start the development server:
+
+```bash
+npm run dev
 ```
 
-To build projects use:
+## Build
 
-```npm
+To build the project for production:
+
+```bash
 npm run build
 ```
 
----
+## Technologies Used
 
-## How it works
-
-To find the best path the program will look for every path's distance and then choose the shortest. It doesn't do any optimisation operations.
-
----
-
-## Used
-
--  Parcel
--  Typescript
+-  Vite
+-  TypeScript
 -  Sass
